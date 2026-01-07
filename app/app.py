@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-
+from fastapi import FastAPI,HTTPException
+from app.schemas import CreatePost
 app = FastAPI()
 
 thePosts = {
@@ -32,4 +32,20 @@ thePosts = {
 
 @app.get("/posts")
 def getAllPosts():
+
     return thePosts
+
+#this is for like a particular post you click on
+
+@app.get("/posts/{id}")
+def get_post(id: int):
+    if id not in thePosts:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return thePosts.get(id)
+
+@app.post("/posts")
+def createPost(post: CreatePost):
+    newPost = {"title": post.title,"content": post.content,"author": post.author}
+    thePosts[max(thePosts.keys())+1] = newPost
+    return {"message": "New thingy added successfully"}
+
